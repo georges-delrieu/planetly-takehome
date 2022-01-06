@@ -1,13 +1,8 @@
-#FastAPI and Pydantic Related Libraries
-from datetime import datetime
 from fastapi import FastAPI
-from pydantic import BaseModel,Field
-from typing import List
-
-#APScheduler Related Libraries
 from apscheduler.schedulers.background import BackgroundScheduler
 import docker
 import logging
+
 
 app = FastAPI(title="Status State API",description="Recurringly checks the status of locally running containers")
 logger = logging.getLogger(__name__)
@@ -17,7 +12,7 @@ def listing_containers():
     running_containers = client.containers.list()
     return [{"name": str(running_container.name),
             "status": str(running_container.status),
-            "image": str(running_container.image),
+            "image": str(running_container.image).split(' ')[1][:-1],
             "container ID": str(running_container.id)} 
             for running_container in running_containers]
 
