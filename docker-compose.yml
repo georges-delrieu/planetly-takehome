@@ -1,0 +1,19 @@
+version: "3.9"
+services:
+  api:
+    build: ./status-state-api/
+    ports:
+      - "80:80"
+    volumes:
+      - /var/run/docker.sock:/var/run/docker.sock
+  controller:
+    build: ./status-state-controller/
+    ports:
+      - "90:90"
+    volumes:
+      - /var/run/docker.sock:/var/run/docker.sock
+    environment:
+      - PYTHONUNBUFFERED=1
+    depends_on:
+      - api
+  
