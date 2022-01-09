@@ -9,7 +9,7 @@ def listing_containers():
     return [{"name": str(running_container.name),
             "status": str(running_container.status),
             "image": str(running_container.image),
-            "container ID": str(running_container.id)} 
+            "container ID": str(running_container.short_id)} 
             for running_container in running_containers]
 
 @app.on_event("startup")
