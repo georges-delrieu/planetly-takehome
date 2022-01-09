@@ -9,7 +9,6 @@ async def asgi_handler(scope, receiver, sender):
     if message['type'] == 'lifespan.startup':
       loop = asyncio.get_running_loop()
       loop.create_task(cron())
-      await sender({'type': 'lifespan.startup.complete'})
 
 async def cron():
     client = docker.from_env()
@@ -27,5 +26,4 @@ if __name__ == '__main__':
                 lifespan = 'on',
                 workers = 1,
                 log_level = "warning",
-                interface = 'asgi3',
                 timeout_keep_alive = 5)
