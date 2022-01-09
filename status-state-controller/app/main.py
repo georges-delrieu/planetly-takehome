@@ -10,8 +10,6 @@ async def asgi_handler(scope, receiver, sender):
       loop = asyncio.get_running_loop()
       loop.create_task(cron())
       await sender({'type': 'lifespan.startup.complete'})
-    elif message['type'] == 'lifespan.shutdown':
-      await sender({'type': 'lifespan.shutdown.complete'})
 
 async def cron():
     client = docker.from_env()
