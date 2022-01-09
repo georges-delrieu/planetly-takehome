@@ -2,9 +2,6 @@ from func import fetching_containers, clearing_containers, restarting_containers
 import asyncio
 import docker
 
-
-loop = None
-
 async def asgi_handler(scope, receiver, sender):
   global loop
   if scope['type'] == 'lifespan':
@@ -15,11 +12,6 @@ async def asgi_handler(scope, receiver, sender):
       await sender({'type': 'lifespan.startup.complete'})
     elif message['type'] == 'lifespan.shutdown':
       await sender({'type': 'lifespan.shutdown.complete'})
-    return
-
-  await sender({'type': 'http.response.start', 'status': 200, 'headers': [[b'content-type', b'text-plain']] })
-  await sender({'type': 'http.response.body', 'body': b'fine test'})
-
 
 async def cron():
     client = docker.from_env()
