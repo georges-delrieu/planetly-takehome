@@ -30,9 +30,25 @@ Main.py contains the CRON job definition and the asyncronous loop. Main.py uses 
 
 ## Improvements
 An issue with the current design is that it simply monitors container runtime. However to keep a healthy system running it could also check for application state. Indeed the application inside the container might be failing while the container is up.
-A more sophisticated version of the tool could be collecting logs from the containers and restarting them upon a pre-set severity level.
+A more sophisticated version of the tool could be collecting logs from the containers and restarting them upon exceeding a pre-set severity level.
 ## Kubernetes Implementation
-The tool is redundant with some of the built in Kubernetes features and could be replicating through a few settings.
-<!-- Inside Kubernetes pods, the kubelet can perform the restarting function of the tool by setting the [restartPolicy](https://kubernetes.io/docs/concepts/workloads/pods/pod-lifecycle/) to 'Always' or 'OnFailure'. -->
+### ReplicaSet
+The tool is redundant with some of the built-in Kubernetes features and could be replaced by a [ReplicaSet](https://kubernetes.io/docs/concepts/workloads/controllers/replicaset/).
 
-In a Kubernetes cluster, we would arrange our containers so that each of them is hosted in a separated pod. To start our cluster, we would define a desired state through a deployment.yaml file. In it, we would set the pods that we want to see running and the numbers of replica we expect.
+In a Kubernetes cluster, we would arrange our containers so that each of them is hosted in a separated pod. The ReplicaSet would then be a setting of Deployment tasked with terminating the unnecessary pods and starting the required ones.
+
+### Deployment
+To start our cluster, we would define a desired state through a deployment.yaml file. In it, we would set the pods that we want to see running and the numbers of replica we expect.
+
+The file ```example-nginx-deployment.yaml``` provides an example on how containers would be defined. In there, the spec 'replicas' would have to be set to the number of nginx containers that we want to have up.
+
+For Kubernetes to maintain our desired containers up, best practice would be to create a deployment file for each of the containers and let the ReplicaSet maintain the desired state.
+
+After starting the cluster with the command:
+````
+kubectl apply -f ./example-nginx-deployment.yaml
+````
+We would be able to monitor the status of our containers with:
+````
+kubectl get pods --show-labels
+````
