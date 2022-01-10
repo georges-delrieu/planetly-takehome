@@ -28,10 +28,10 @@ Func.py contains the functions to ping the SSA, restart containers and stop them
 
 Main.py contains the CRON job definition and the asyncronous loop. Main.py uses the python built-in module [asyncio](https://docs.python.org/3/library/asyncio.html) to create the loop.
 
-## Improvements
+## Improvements 🔥
 An issue with the current design is that it simply monitors container runtime. However to keep a healthy system running it could also check for application state. Indeed the application inside the container might be failing while the container is up.
 A more sophisticated version of the tool could be collecting logs from the containers and restarting them upon exceeding a pre-set severity level.
-## Kubernetes Implementation
+## Kubernetes Implementation 🌊
 ### ReplicaSet
 The tool is redundant with some of the built-in Kubernetes features and could be replaced by a [ReplicaSet](https://kubernetes.io/docs/concepts/workloads/controllers/replicaset/).
 
