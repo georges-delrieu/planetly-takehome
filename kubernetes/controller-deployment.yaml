@@ -1,0 +1,46 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  annotations:
+    kompose.cmd: kompose convert -f docker-compose copy.yml
+    kompose.version: 1.26.1 (a9d05d509)
+  creationTimestamp: null
+  labels:
+    io.kompose.service: controller
+  name: controller
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      io.kompose.service: controller
+  strategy:
+    type: Recreate
+  template:
+    metadata:
+      annotations:
+        kompose.cmd: kompose convert -f docker-compose copy.yml
+        kompose.version: 1.26.1 (a9d05d509)
+      creationTimestamp: null
+      labels:
+        io.kompose.service: controller
+    spec:
+      containers:
+        - env:
+            - name: PORT_API
+            - name: PORT_CONTROLLER
+            - name: PYTHONUNBUFFERED
+              value: "1"
+          image: controller
+          name: controller
+          ports:
+            - containerPort: 8000
+          resources: {}
+          volumeMounts:
+            - mountPath: /var/run/docker.sock
+              name: controller-claim0
+      restartPolicy: Always
+      volumes:
+        - name: controller-claim0
+          persistentVolumeClaim:
+            claimName: controller-claim0
+status: {}

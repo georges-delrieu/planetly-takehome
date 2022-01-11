@@ -46,20 +46,15 @@ If the API were to grow in size, it would be important to improve the testing se
 The rough architecture of a Kubernetes implementation of this tool is the following:
 ![Schematic of architecture](/kubernetes_schematic.png)
 ### Service and Deployment
-To deploy the tool in a Kubernetes cluster and fully take advantage of its scaling potential, we would put a load balancer as service in front of the uvicorn workers in the SSA and SSH. The load balancer is described in the first block ('service') of the [deployment file](./deployment-example.yaml).
+To deploy the tool in a Kubernetes cluster and fully take advantage of its scaling potential, we would put a load balancer as service in front of the uvicorn workers in the SSA and SSH. The load balancer is described in the [service file](./deployment-example.yaml).
 
 We would also increase the number of SSA and SSH containers to balance the load between. This would be set in the second block ('deployment')
 
 ### Tooling: Kompose
-To quickly transition from the current docker-compose setup to a Kubernetes cluster, [Kompose](https://github.com/kubernetes/kompose) seems appropriate.
+To quickly transition from the current docker-compose setup to a Kubernetes cluster I used [Kompose](https://github.com/kubernetes/kompose) to generate the kubernetes manifest files in the [kubernetes folder](./kubernetes).
 
-Kompose would quickly transform the docker-compose.yaml into a set of Kubernetes manifest files by running 
-
-````
-kompose convert -f docker-compose.yaml
-````
 ### Deployment strategy: Blue/green
-For this tool, a 'blue/green' strategy of deployment would be suited. The idea of a blue/green deployment is to switch the traffic to new versions at the load balancer level using the version parameter of the 'selector' (line 9 of the [deployment file](./deployment-example.yaml)). 
+For this tool, a 'blue/green' strategy of deployment would be suited. The idea of a blue/green deployment is to switch the traffic to new versions at the load balancer level using the version parameter of the 'selector' (line 17 of the [service file](./kubernetes/api-service.yaml)). 
 This would avoid versioning issues and enable instant rollout and rollback.
 
 For a stateless application like this one, the pros of a blue/green strategy outweigh the cons.

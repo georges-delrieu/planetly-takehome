@@ -1,0 +1,44 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  annotations:
+    kompose.cmd: kompose convert -f docker-compose copy.yml
+    kompose.version: 1.26.1 (a9d05d509)
+  creationTimestamp: null
+  labels:
+    io.kompose.service: api
+  name: api
+spec:
+  replicas: 3
+  selector:
+    matchLabels:
+      io.kompose.service: api
+  strategy:
+    type: Recreate
+  template:
+    metadata:
+      annotations:
+        kompose.cmd: kompose convert -f docker-compose copy.yml
+        kompose.version: 1.26.1 (a9d05d509)
+      creationTimestamp: null
+      labels:
+        io.kompose.service: api
+    spec:
+      containers:
+        - env:
+            - name: PORT_API
+              value: "8080"
+          image: api
+          name: api
+          ports:
+            - containerPort: 8080
+          resources: {}
+          volumeMounts:
+            - mountPath: /var/run/docker.sock
+              name: api-claim0
+      restartPolicy: Always
+      volumes:
+        - name: api-claim0
+          persistentVolumeClaim:
+            claimName: api-claim0
+status: {}
