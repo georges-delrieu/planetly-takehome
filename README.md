@@ -8,12 +8,13 @@ docker compose up
 
 ## Architecture
 ![Schematic of architecture](/schematic_planetly.png)
+
 The architecture of the tool revolves mainly around two containers: the Status State API (SSA) and the Status State Controller (SSC).
 ### Status State API: Monitoring 👀
 The role of the SSA is to take a snapshot of locally running containers at the start of the SSA and make this snapshot available through a http endpoint.
 
 The http requests to the SSA are handled by FastAPI, a web framework for developing APIs in Python.
-For this use case, the main strengths of using [FastAPI](https://github.com/tiangolo/fastapi) is the very fast response time, the ease of development and the documentation.
+For this use case, the main strengths of using [FastAPI](https://github.com/tiangolo/fastapi) is the very fast response time, the ease of development and the great documentation.
 
 The FastAPI app exposes a single endpoint (/) which triggers and responds the [Python SDK](https://docker-py.readthedocs.io/en/stable/containers.html) equivalent for ```docker ps``` upon request. 
 
@@ -38,7 +39,7 @@ The tool is redundant with some of the built-in Kubernetes features and could be
 In a Kubernetes cluster, we would arrange our containers so that each of them is hosted in a separated pod. The ReplicaSet would then be a setting of Deployment tasked with terminating the unnecessary pods and starting the required ones.
 
 ### Deployment
-To start our cluster, we would define a desired state through a deployment.yaml file. In it, we would set the pods that we want to see running and the numbers of replica we expect.
+To achieve this functionality in a Kubernetes cluster, we would first define a desired state through a deployment.yaml file. In it, we would set the pods that we want to see running and the numbers of replica we expect.
 
 The file ```example-nginx-deployment.yaml``` provides an example on how containers would be defined. In there, the spec 'replicas' would have to be set to the number of nginx containers that we want to have up.
 
@@ -52,3 +53,6 @@ We would be able to monitor the status of our containers with:
 ````
 kubectl get pods --show-labels
 ````
+
+
+Thanks for reading! 🌱
