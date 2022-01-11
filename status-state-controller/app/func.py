@@ -1,16 +1,20 @@
 import requests
 import ast
 import logging
+import os
+from typing import List
+import docker
 
 logging.basicConfig(level=logging.INFO)
 
 def fetching_containers():
-    r = requests.get('http://host.docker.internal:8080')
+    r = requests.get(f'http://host.docker.internal:{os.environ["PORT_API"]}/status')
     return [{"container_id": container["container ID"]
             ,"container_name": container["name"]} for container in ast.literal_eval(r.text)]
 
-def clearing_containers(status_state_list, client):
+def clearing_containers(status_state_list: List[str]):
     '''Destroys containers outside the list of required containers'''
+    client = docker.from_env()
     logging.info('Checking for unwelcome containers')
     id_required_containers = [container['container_id'] for container in status_state_list]
     for running_container in client.containers.list():
@@ -19,8 +23,9 @@ def clearing_containers(status_state_list, client):
             running_container.stop()
             logging.warning(f'Container {running_container.name} was successfully stopped ✅')
 
-def restarting_containers(status_state_list, client):
+def restarting_containers(status_state_list: List[str]):
     '''Restarts stopped containers among the required containers'''
+    client = docker.from_env()
     id_running_containers = [container.short_id for container in client.containers.list()]
     id_required_containers = [container['container_id'] for container in status_state_list]
     logging.info('Checking for missing containers')

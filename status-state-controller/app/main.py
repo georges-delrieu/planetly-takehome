@@ -1,6 +1,6 @@
 from func import fetching_containers, clearing_containers, restarting_containers
 import asyncio
-import docker
+import os
 
 async def asgi_handler(scope, receiver, sender):
   global loop
@@ -11,18 +11,20 @@ async def asgi_handler(scope, receiver, sender):
       loop.create_task(cron())
 
 async def cron():
-    client = docker.from_env()
     status_state_list = fetching_containers()
     while True:
-        clearing_containers(status_state_list, client)
-        restarting_containers(status_state_list, client)
-        await asyncio.sleep(30)
+        try:
+          clearing_containers(status_state_list)
+          restarting_containers(status_state_list)
+          await asyncio.sleep(30)
+        except AssertionError as e:
+          print(e)
 
 if __name__ == '__main__':
   import uvicorn
   uvicorn.run("main:asgi_handler",
                 host = '0.0.0.0',
-                port = 8000,
+                port = os.environ['PORT_CONTROLLER'],
                 lifespan = 'on',
                 workers = 1,
                 log_level = "warning",
