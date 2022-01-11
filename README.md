@@ -7,7 +7,7 @@ docker compose up
 ```
 
 ## Architecture
-![Schematic of architecture](/schematic_planetly.png)
+![Schematic of architecture](/compose_schematic.png)
 
 The architecture of the tool revolves mainly around two containers: the Status State API (SSA) and the Status State Controller (SSC).
 ### Status State API: Monitoring 👀
@@ -30,29 +30,40 @@ Func.py contains the functions to ping the SSA, restart containers and stop them
 Main.py contains the CRON job definition and the asyncronous loop. Main.py uses the python built-in module [asyncio](https://docs.python.org/3/library/asyncio.html) to create the loop.
 
 ## Improvements 🔥
+### Application level monitoring
 An issue with the current design is that it simply monitors container runtime. However to keep a healthy system running it could also check for application state. Indeed the application inside the container might be failing while the container is up.
 A more sophisticated version of the tool could be collecting logs from the containers and restarting them upon exceeding a pre-set severity level. Alternatively, the SSA could also ping the /health endpoint of the running containers.
+
+### Load testing
+
 ## Kubernetes Implementation 🌊
+### Design
+The rough architecture of a Kubernetes implementation of this tool is the following:
+![Schematic of architecture](/kubernetes_schematic.png)
+### Service and Deployment
+To deploy the tool in a Kubernetes cluster and fully take advantage of its scaling potential, we would put a load balancer as service in front of the uvicorn workers in the SSA and SSH. The load balancer is described in the first block ('service') of the [deployment file](./deployment-example.yaml).
+
+We would also increase the number of SSA and SSH containers to balance the load between. This would be set in the second block ('deployment')
+
+### Tooling: Kompose
+To quickly transition from the current docker-compose setup to a Kubernetes cluster, [Kompose](https://github.com/kubernetes/kompose) seems appropriate.
+
+Kompose would quickly transform the docker-compose.yaml into a set of Kubernetes manifest files by running 
+
+````
+kompose convert -f docker-compose.yaml
+````
+### Deployment strategy: Blue/green
+For this tool, a 'blue/green' strategy of deployment would be suited. The idea of a blue/green deployment is to switch the traffic to new versions at the load balancer level using the version parameter of the 'selector' (line 9 of the [deployment file](./deployment-example.yaml)). 
+This would avoid versioning issues and enable instant rollout and rollback.
+
+For a stateless application like this one, the pros of a blue/green strategy outweigh the cons.
+## Note on Kubernetes
 ### ReplicaSet
-The tool is redundant with some of the built-in Kubernetes features and could be replaced by a [ReplicaSet](https://kubernetes.io/docs/concepts/workloads/controllers/replicaset/).
+The tool would be made redundant by Kubernetes if the local containers were hosted inside the cluster. Then, the tool would be replaced by a [ReplicaSet](https://kubernetes.io/docs/concepts/workloads/controllers/replicaset/).
 
-In a Kubernetes cluster, we would arrange our containers so that each of them is hosted in a separated pod. The ReplicaSet would then be a setting of Deployment tasked with terminating the unnecessary pods and starting the required ones.
+The ReplicaSet defined in the deployment file would take care terminating the unnecessary pods and starting the required ones.
 
-### Deployment
-To achieve this functionality in a Kubernetes cluster, we would first define a desired state through a deployment.yaml file. In it, we would set the pods that we want to see running and the numbers of replica we expect.
-
-The file ```example-nginx-deployment.yaml``` provides an example on how containers would be defined. In there, the spec 'replicas' would have to be set to the number of nginx containers that we want to have up.
-
-For Kubernetes to maintain our desired containers up, best practice would be to create a deployment file for each of the containers and let the ReplicaSet maintain the desired state.
-
-After starting the cluster with the command:
-````
-kubectl apply -f ./example-nginx-deployment.yaml
-````
-We would be able to monitor the status of our containers with:
-````
-kubectl get pods --show-labels
-````
 
 
 Thanks for reading! 🌱

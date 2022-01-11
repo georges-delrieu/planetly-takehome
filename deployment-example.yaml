@@ -1,0 +1,39 @@
+#FastAPI LoadBalancer Service
+apiVersion: v1
+kind: Service
+metadata:
+  name: fastapi-service
+spec:
+  selector:
+    app: kf-api
+    version: v1.0 # We would update this value to rollout/rollback
+  ports:
+    - protocol: "TCP"
+      port: 8080
+      targetPort: 8080
+  type: LoadBalancer
+
+---
+# FastAPI Deployment
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: fastapi
+  labels:
+    app: fastapi
+spec:
+  replicas: 3
+  selector:
+    matchLabels:
+      app: fastapi
+  template:
+    metadata:
+      labels:
+        app: fastapi
+    spec:
+      containers:
+        - name: SSA
+          image: georges-delrieu/SSA:latest #example dockerhub link
+          ports:
+            - containerPort: 8080
+          imagePullPolicy: Always
