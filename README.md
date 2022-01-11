@@ -16,14 +16,14 @@ The role of the SSA is to take a snapshot of locally running containers at the s
 The http requests to the SSA are handled by FastAPI, a web framework for developing APIs in Python.
 For this use case, the main strengths of using [FastAPI](https://github.com/tiangolo/fastapi) is the very fast response time, the ease of development and the great documentation.
 
-The FastAPI app exposes a single endpoint (/) which triggers and responds the [Python SDK](https://docker-py.readthedocs.io/en/stable/containers.html) equivalent for ```docker ps``` upon request. 
+The FastAPI app exposes the /status endpoint which executes and return the output of the [Python SDK](https://docker-py.readthedocs.io/en/stable/containers.html) equivalent for ```docker ps``` upon request. It also exposes an OpenAPI doc for the app at /docs.
 
 ### Status State Controller: Healing 🚑
 The role of the SSC is to take action based on the data collected by the SSA. It is tasked with ensuring that the locally running containers remain the same throughout the lifetime of the tool. 
 
 Concretely, the SSC ingests the snapshot created by the SSA at launch and compares the running containers against this snapshot every 30 seconds. If some of the original containers go down, it restarts them. If new containers are created, it takes them down.
 
-The SSC is another Python-based container, split in two parts: func.py and main.py. 
+The SSC is another Python-based container, split in two parts: [func.py](./status-state-controller/app/func.py) and [main.py]((./status-state-controller/app/main.py)). 
 
 Func.py contains the functions to ping the SSA, restart containers and stop them when necessary.
 
@@ -31,7 +31,7 @@ Main.py contains the CRON job definition and the asyncronous loop. Main.py uses 
 
 ## Improvements 🔥
 An issue with the current design is that it simply monitors container runtime. However to keep a healthy system running it could also check for application state. Indeed the application inside the container might be failing while the container is up.
-A more sophisticated version of the tool could be collecting logs from the containers and restarting them upon exceeding a pre-set severity level.
+A more sophisticated version of the tool could be collecting logs from the containers and restarting them upon exceeding a pre-set severity level. Alternatively, the SSA could also ping the /health endpoint of the running containers.
 ## Kubernetes Implementation 🌊
 ### ReplicaSet
 The tool is redundant with some of the built-in Kubernetes features and could be replaced by a [ReplicaSet](https://kubernetes.io/docs/concepts/workloads/controllers/replicaset/).
