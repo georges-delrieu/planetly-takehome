@@ -63,6 +63,9 @@ For this tool, a 'blue/green' strategy of deployment would be suited. The idea o
 This would avoid versioning issues and enable instant rollout and rollback.
 
 For a stateless application like this one, the pros of a blue/green strategy outweigh the cons.
+
+### Monitoring
+For monitoring, we could pick open-source solutions like [Prometheus](https://prometheus.io/docs/introduction/overview/) to collect the data and [Grafana](https://grafana.com/) to visualize them.
 ## Note on Kubernetes
 ### ReplicaSet
 The tool would be made redundant by Kubernetes if the local containers were hosted inside the cluster. Then, the tool would be replaced by a [ReplicaSet](https://kubernetes.io/docs/concepts/workloads/controllers/replicaset/).
