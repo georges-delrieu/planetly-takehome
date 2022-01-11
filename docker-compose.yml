@@ -3,17 +3,21 @@ services:
   api:
     build: ./status-state-api/
     ports:
-      - "8080:8080"
+      - "${PORT_API}:${PORT_API}"
     volumes:
       - /var/run/docker.sock:/var/run/docker.sock
+    environment:
+      - PORT_API=${PORT_API}
   controller:
     build: ./status-state-controller/
     ports:
-      - "8000:8000"
+      - "${PORT_CONTROLLER}:${PORT_CONTROLLER}"
     volumes:
       - /var/run/docker.sock:/var/run/docker.sock
     environment:
       - PYTHONUNBUFFERED=1
+      - PORT_API=${PORT_API}
+      - PORT_CONTROLLER=${PORT_CONTROLLER}
     depends_on:
       - api
   
