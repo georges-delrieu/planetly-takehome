@@ -35,7 +35,12 @@ An issue with the current design is that it simply monitors container runtime. H
 A more sophisticated version of the tool could be collecting logs from the containers and restarting them upon exceeding a pre-set severity level. Alternatively, the SSA could also ping the /health endpoint of the running containers.
 
 ### Load testing
+To further improve the resilience of this tool and prevent downtime it would be important to conduct load testing on it. This would give us better idea of the current response time under stress and make appropriate design decisions.
 
+It could be quickly performed using a tool like [Locust](https://locust.io/).
+
+### Application testing
+If the API were to grow in size, it would be important to improve the testing setting and increase the speed of testing.
 ## Kubernetes Implementation 🌊
 ### Design
 The rough architecture of a Kubernetes implementation of this tool is the following:
