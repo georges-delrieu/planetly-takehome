@@ -8,6 +8,9 @@ services:
       - /var/run/docker.sock:/var/run/docker.sock
     environment:
       - PORT_API=${PORT_API}
+    extra_hosts:
+      # creating extra role for Linux users
+      - "host.docker.internal:host-gateway"
   controller:
     build: ./status-state-controller/
     ports:
@@ -20,6 +23,8 @@ services:
       - PORT_CONTROLLER=${PORT_CONTROLLER}
     depends_on:
       - api
+    extra_hosts:
+      - "host.docker.internal:host-gateway" 
   mock-container:
     image: nginx
     volumes:
