@@ -1,4 +1,4 @@
-from fastapi import FastAPI
+from fastapi import FastAPI, HTTPException
 from app.utils import getting_container_list
 
 app = FastAPI(title="Status State API",description="Checks the status of locally running containers at launch")
@@ -11,9 +11,8 @@ def listing_containers():
                 "image": str(running_container.image),
                 "container ID": str(running_container.short_id)} 
                 for running_container in running_containers]
-    except AssertionError as e:
-        print(e)
-        print(f"Running containers format error. Your containers: {running_containers}")
+    except:
+        raise HTTPException(status_code=500, detail="Containers not found")
 
 
 @app.on_event("startup")
