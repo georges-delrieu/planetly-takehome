@@ -20,4 +20,9 @@ services:
       - PORT_CONTROLLER=${PORT_CONTROLLER}
     depends_on:
       - api
-  
+  mock-container:
+    image: nginx
+    volumes:
+    - ./templates:/etc/nginx/templates
+    ports:
+    - "80:${PORT_MOCK}"

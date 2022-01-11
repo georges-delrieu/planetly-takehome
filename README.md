@@ -2,10 +2,15 @@
 
 ## Quickstart
 To get things started make sure you have [Docker installed](https://docs.docker.com/get-docker/) and in path and run:
-```
+````
 docker compose up
-```
+````
 
+To quickly test the tool, a mock container will be started along with the main components. You can shut it down with 
+````
+docker stop planetly-takehome_mock-container_1
+````
+And watch the tool build it back up 👷
 ## Architecture
 ![Schematic of architecture](/compose_schematic.png)
 
